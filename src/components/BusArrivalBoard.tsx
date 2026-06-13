@@ -1,4 +1,4 @@
-import { Bus, Clock, RefreshCw, Accessibility, MapPin, Star } from 'lucide-react';
+import { Bus, Clock, RefreshCw, Accessibility, MapPin, Star, X } from 'lucide-react';
 import { useBusArrivals, getMinutesUntil, LOAD_LABELS, BUS_TYPE, OPERATOR_NAMES, type BusArrivalService } from '../hooks/useBusData';
 import { useFavourites } from '../hooks/useFavourites';
 
@@ -30,7 +30,7 @@ function BusServiceRow({ service }: { service: BusArrivalService }) {
           const isClose = mins <= 3;
           return (
             <div key={i} className={`flex flex-col items-center px-2.5 py-1.5 rounded-lg min-w-[60px] ${i === 0 ? (isArr ? 'bg-green-600 text-white' : isClose ? 'bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-900' : 'bg-gray-50 dark:bg-gray-800') : 'bg-gray-50 dark:bg-gray-800'}`}>
-              <span className={`text-sm font-bold ${i === 0 && isArr ? 'text-white' : isArr ? 'text-green-700 dark:text-green-400' : 'text-gray-800 dark:text-gray-100'}`}>{isArr ? 'Arr' : `${mins}m`}</span>
+              <span className={`text-sm font-bold tabular-nums ${i === 0 && isArr ? 'text-white' : isArr ? 'text-green-700 dark:text-green-400' : 'text-gray-800 dark:text-gray-100'}`}>{isArr ? 'Arr' : `${mins}m`}</span>
               <div className="flex items-center gap-0.5 mt-0.5">
                 {bus.Load && <span className={`w-1.5 h-1.5 rounded-full ${bus.Load === 'SEA' ? 'bg-green-500' : bus.Load === 'SDA' ? 'bg-amber-500' : 'bg-red-500'}`} />}
                 {isWAB && <Accessibility size={9} className={i === 0 && isArr ? 'text-white' : 'text-blue-500'} />}
@@ -40,7 +40,7 @@ function BusServiceRow({ service }: { service: BusArrivalService }) {
           );
         })}
       </div>
-      <span className="text-[10px] text-gray-400 w-16 text-right truncate hidden sm:block">{operator}</span>
+      <span className="text-[11px] text-gray-500 dark:text-gray-400 w-16 text-right truncate hidden sm:block">{operator}</span>
     </div>
   );
 }
@@ -61,8 +61,8 @@ export default function BusArrivalBoard({ busStopCode, busStopName, roadName, on
               <Star size={13} className={isFav ? 'fill-amber-300 text-amber-300' : ''} />
               {isFav ? 'Saved' : 'Save'}
             </button>
-            <button onClick={refresh} className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"><RefreshCw size={12} className={loading ? 'animate-spin' : ''} /></button>
-            <button onClick={onClose} className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"><span className="text-xs font-bold">X</span></button>
+            <button onClick={refresh} aria-label="Refresh bus arrivals" className="p-2.5 -m-1 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 transition-all"><RefreshCw size={14} className={loading ? 'animate-spin' : ''} /></button>
+            <button onClick={onClose} aria-label="Close bus arrivals" className="p-2.5 -m-1 rounded-full bg-white/10 hover:bg-white/20 active:scale-90 transition-all text-white"><X size={14} /></button>
           </div>
         </div>
         <h2 className="text-lg font-bold">{busStopName}</h2>
@@ -75,7 +75,18 @@ export default function BusArrivalBoard({ busStopCode, busStopName, roadName, on
         <div className="flex items-center gap-1"><Accessibility size={9} className="text-blue-500" /> Wheelchair</div>
       </div>
       <div className="px-4 py-1 max-h-[50vh] overflow-y-auto">
-        {error && <div className="py-8 text-center text-red-500 text-sm">{error}</div>}
+        {/* Fail-soft: only show the error state when we have NOTHING to fall back on */}
+        {error && services.length === 0 && (
+          <div className="py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <Clock size={20} className="mx-auto mb-2 opacity-40" />
+            Couldn't reach LTA just now.
+            <button onClick={refresh} className="block mx-auto mt-2 text-blue-600 dark:text-blue-400 font-semibold">Tap to retry</button>
+          </div>
+        )}
+        {/* Refresh failed but we still hold the last good timings — keep showing them */}
+        {error && services.length > 0 && (
+          <p className="px-1 pt-2 text-[11px] text-amber-600 dark:text-amber-400">Couldn't refresh — showing last known timings.</p>
+        )}
         {services.length === 0 && !loading && !error && (
           <div className="py-8 text-center text-gray-400 dark:text-gray-500 text-sm"><Clock size={20} className="mx-auto mb-2 opacity-40" />No bus services available at this time</div>
         )}

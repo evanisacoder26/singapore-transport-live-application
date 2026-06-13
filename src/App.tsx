@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { TrainFront as Train, TramFront as Tram, Bus, RefreshCw, MapPin, Moon, Sun, LocateFixed, Star, Clock, RotateCw } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import LineSelector from './components/LineSelector';
@@ -9,6 +9,7 @@ import SearchBar from './components/SearchBar';
 import BusStopList from './components/BusStopList';
 import BusArrivalBoard from './components/BusArrivalBoard';
 import CclWayfinding from './components/CclWayfinding';
+import HeaderClock from './components/HeaderClock';
 import { STATIONS, getStationsByLine, searchStations, type Station } from './data/stations';
 import { useCrowdData, useTrainAlerts, useMaintenanceData } from './hooks/useMrtData';
 import { useBusStops, type BusStop } from './hooks/useBusData';
@@ -25,13 +26,7 @@ export default function App() {
   const [activeLine, setActiveLine] = useState('NS');
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [query, setQuery] = useState('');
-  const [now, setNow] = useState(new Date());
   const [selectedBusStop, setSelectedBusStop] = useState<BusStop | null>(null);
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(id);
-  }, []);
 
   const geo = useGeolocation();
   const fav = useFavourites();
@@ -162,7 +157,7 @@ export default function App() {
               <h1 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
                 {tab === 'ccl' ? 'SG Circle Line' : `SG ${tabLabel(tab)} Live`}
               </h1>
-              <p className="text-xs text-gray-400 dark:text-gray-500">{now.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' })}</p>
+              <HeaderClock />
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -170,7 +165,7 @@ export default function App() {
               <Sun size={13} className="text-gray-400 dark:text-gray-500" />
               <button
                 onClick={toggleTheme}
-                className={`relative w-10 h-5 rounded-full transition-colors duration-300 focus:outline-none ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`}
+                className={`relative w-10 h-5 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`}
                 title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
                 aria-label="Toggle dark mode"
               >
@@ -294,7 +289,7 @@ export default function App() {
 
             {selectedStation && (
               <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedStation(null)} />
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedStation(null)} />
                 <div className="relative bg-white dark:bg-gray-950 rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
                   <div className="flex-shrink-0 flex justify-center py-2.5"><div className="w-10 h-1 rounded-full bg-gray-200 dark:bg-gray-700" /></div>
                   <div className="flex-1 overflow-hidden">
@@ -330,9 +325,9 @@ export default function App() {
 
         {tab === 'bus' && selectedBusStop && (
           <div className="lg:hidden fixed inset-0 z-40 flex flex-col justify-end">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedBusStop(null)} />
-            <div className="relative bg-white rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
-              <div className="flex-shrink-0 flex justify-center py-2.5"><div className="w-10 h-1 rounded-full bg-gray-200" /></div>
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedBusStop(null)} />
+            <div className="relative bg-white dark:bg-gray-950 rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
+              <div className="flex-shrink-0 flex justify-center py-2.5"><div className="w-10 h-1 rounded-full bg-gray-200 dark:bg-gray-700" /></div>
               <div className="flex-1 overflow-hidden">
                 <BusArrivalBoard busStopCode={selectedBusStop.BusStopCode} busStopName={selectedBusStop.Description} roadName={selectedBusStop.RoadName} onClose={() => setSelectedBusStop(null)} />
               </div>

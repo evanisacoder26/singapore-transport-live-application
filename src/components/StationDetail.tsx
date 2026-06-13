@@ -61,10 +61,10 @@ export default function StationDetail({ station, crowdEntry, maintenance, onClos
               <Star size={14} className={isFav ? 'fill-amber-300 text-amber-300' : ''} />
               {isFav ? 'Saved' : 'Save'}
             </button>
-            <button onClick={onRefresh} className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+            <button onClick={onRefresh} aria-label="Refresh crowd data" className="p-2.5 -m-1 rounded-full bg-white/20 hover:bg-white/30 active:scale-90 transition-all">
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
             </button>
-            <button onClick={onClose} className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
+            <button onClick={onClose} aria-label="Close station details" className="p-2.5 -m-1 rounded-full bg-white/20 hover:bg-white/30 active:scale-90 transition-all">
               <X size={14} />
             </button>
           </div>

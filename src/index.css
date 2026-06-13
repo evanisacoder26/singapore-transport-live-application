@@ -9,4 +9,28 @@
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Remove the 300ms tap delay and accidental double-tap zoom on controls */
+  button,
+  [role='button'],
+  a {
+    touch-action: manipulation;
+  }
+
+  /* Tabular figures for live timers/clocks so digits don't shift width */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Respect users who ask for less motion (vestibular comfort, a11y) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
