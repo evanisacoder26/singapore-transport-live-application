@@ -1,0 +1,10 @@
+# Supabase project configuration.
+# Replace project_id with your actual project ref (Dashboard → Project Settings → Reference ID).
+project_id = "sg-transit"
+
+# The mrt-arrivals function proxies the LTA DataMall API using a server-side key.
+# verify_jwt = true makes the Supabase gateway require a valid project JWT
+# (the frontend sends the anon key as a Bearer token), blocking anonymous
+# internet traffic from reaching the function and burning your LTA quota.
+[functions.mrt-arrivals]
+verify_jwt = true
