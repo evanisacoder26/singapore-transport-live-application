@@ -77,7 +77,7 @@ The app is built around **three core real-time modules**, each backed by a disti
 
 > Per-station platform density, normalized into a three-level traffic-light ring.
 
-<img src="docs/screenshots/feature-crowd.gif" alt="Crowd Status feature" width="640" />
+<img src="docs/screenshots/feature-crowd.png" alt="Crowd Status feature" width="320" />
 
 | Aspect | Detail |
 | :--- | :--- |
@@ -93,7 +93,7 @@ The app is built around **three core real-time modules**, each backed by a disti
 
 > Network-wide disruption, planned-works, and incident messaging — with a fail-soft banner.
 
-<img src="docs/screenshots/feature-alerts.gif" alt="Live Service Alerts feature" width="640" />
+<img src="docs/screenshots/feature-alerts.png" alt="Live Service Alerts feature" width="320" />
 
 | Aspect | Detail |
 | :--- | :--- |
@@ -109,7 +109,7 @@ The app is built around **three core real-time modules**, each backed by a disti
 
 > Next-three-bus countdown per stop, with load and accessibility indicators.
 
-<img src="docs/screenshots/feature-bus.gif" alt="Bus Arrival Timings feature" width="640" />
+<img src="docs/screenshots/feature-bus.png" alt="Bus Arrival Timings feature" width="320" />
 
 | Aspect | Detail |
 | :--- | :--- |
