@@ -99,7 +99,7 @@ export default function BusStopList({ stops, loading, onSelect, selectedCode }: 
     const isFav = fav.isFavStop(stop.BusStopCode);
     return (
       <button key={`${keyPrefix}-${stop.BusStopCode}`} onClick={() => handleSelect(stop)}
-        className={`w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${isSelected ? 'bg-gray-900 dark:bg-gray-800 text-white shadow-md' : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm'}`}>
+        className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-150 ${isSelected ? 'bg-gray-900 dark:bg-gray-800 text-white shadow-md' : 'bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-sm'}`}>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-800'}`}>
           <Bus size={14} className={isSelected ? 'text-white' : 'text-gray-500 dark:text-gray-400'} />
         </div>
@@ -122,11 +122,11 @@ export default function BusStopList({ stops, loading, onSelect, selectedCode }: 
           </div>
           {mrtStations && mrtStations.length > 0 && (
             <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-              <Train size={9} className="text-gray-400" />
+              <Train size={10} className={isSelected ? 'text-gray-300' : 'text-gray-500 dark:text-gray-400'} />
               {mrtStations.map(mrt => (
                 <span
                   key={mrt.code}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold text-white"
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-white"
                   style={{ backgroundColor: mrt.lineColor }}
                 >
                   {mrt.code}
@@ -160,7 +160,7 @@ export default function BusStopList({ stops, loading, onSelect, selectedCode }: 
 
       {showFavRecent && favStops.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
             <Star size={10} className="fill-amber-400 text-amber-400" /> Favourites
           </p>
           {favStops.map(stop => renderRow(stop, 'fav'))}
@@ -169,14 +169,26 @@ export default function BusStopList({ stops, loading, onSelect, selectedCode }: 
 
       {showFavRecent && recentStops.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
             <Clock size={10} /> Recent
           </p>
           {recentStops.map(stop => renderRow(stop, 'recent'))}
         </div>
       )}
 
-      {loading && <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 py-4 justify-center"><div className="w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-gray-600 dark:border-t-gray-400 rounded-full animate-spin" />Loading bus stops...</div>}
+      {loading && (
+        <div className="space-y-1.5" aria-busy="true" aria-label="Loading bus stops">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+              <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3.5 w-2/3 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                <div className="h-2.5 w-2/5 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {!loading && !query.trim() && geo.status === 'locating' && (
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 py-2 justify-center">
           <LocateFixed size={14} className="animate-pulse" /> Finding bus stops near you...
@@ -194,7 +206,7 @@ export default function BusStopList({ stops, loading, onSelect, selectedCode }: 
 
       <div className="space-y-1.5">
         {!query.trim() && displayStops.length > 0 && (
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
             {showingNearest && <Navigation size={10} className="text-blue-500" />}
             {showingNearest ? 'Nearest Stops' : 'Popular Stops'}
           </p>

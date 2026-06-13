@@ -200,7 +200,7 @@ export default function App() {
             <AlertsBanner alerts={alerts} messages={messages} status={status} everLoaded={alertsEverLoaded} stale={alertsStale} lastUpdated={alertsLastUpdated} />
 
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm">
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
                 {tab === 'mrt' ? 'Select MRT Line' : 'Select LRT Line'}
               </p>
               <LineSelector selected={activeLine} onChange={handleLineChange} filter={lineFilter} />
@@ -212,7 +212,7 @@ export default function App() {
               <div className="flex-1 min-w-0">
                 {!query.trim() && !nearbyActive && favStationObjs.length > 0 && (
                   <div className="mb-4">
-                    <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                       <Star size={11} className="fill-amber-400 text-amber-400" /> Favourites
                     </p>
                     <div className="space-y-2">
@@ -227,7 +227,7 @@ export default function App() {
                 )}
                 {!query.trim() && !nearbyActive && recentStationObjs.length > 0 && (
                   <div className="mb-4">
-                    <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                       <Clock size={11} /> Recent
                     </p>
                     <div className="space-y-2">

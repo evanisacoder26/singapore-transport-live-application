@@ -53,7 +53,7 @@ export default function BusArrivalBoard({ busStopCode, busStopName, roadName, on
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
-      <div className="bg-gray-900 text-white p-4">
+      <div className="text-white p-4" style={{ background: 'linear-gradient(135deg, #2563EBee, #2563EBaa)' }}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2"><Bus size={16} /><span className="text-sm font-semibold">Bus Arrivals</span></div>
           <div className="flex items-center gap-2">
@@ -66,9 +66,9 @@ export default function BusArrivalBoard({ busStopCode, busStopName, roadName, on
           </div>
         </div>
         <h2 className="text-lg font-bold">{busStopName}</h2>
-        <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-400"><MapPin size={10} /><span>{roadName}</span><span className="text-gray-500">|</span><span>Stop {busStopCode}</span></div>
+        <div className="flex items-center gap-2 mt-0.5 text-xs text-blue-100"><MapPin size={10} /><span>{roadName}</span><span className="text-white/40">|</span><span>Stop {busStopCode}</span></div>
       </div>
-      <div className="flex items-center gap-4 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800 text-[10px] text-gray-500 dark:text-gray-400">
+      <div className="flex items-center gap-4 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-800 text-[11px] text-gray-600 dark:text-gray-400">
         <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Seats</div>
         <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Standing</div>
         <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Limited</div>
@@ -87,13 +87,27 @@ export default function BusArrivalBoard({ busStopCode, busStopName, roadName, on
         {error && services.length > 0 && (
           <p className="px-1 pt-2 text-[11px] text-amber-600 dark:text-amber-400">Couldn't refresh — showing last known timings.</p>
         )}
+        {/* Skeleton while first load is in flight */}
+        {loading && services.length === 0 && !error && (
+          <div className="py-1" aria-busy="true" aria-label="Loading arrivals">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 py-3 border-b border-gray-50 dark:border-gray-800 last:border-0">
+                <div className="w-12 h-8 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse flex-shrink-0" />
+                <div className="flex-1 flex gap-2">
+                  <div className="h-11 w-[60px] rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                  <div className="h-11 w-[60px] rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {services.length === 0 && !loading && !error && (
           <div className="py-8 text-center text-gray-400 dark:text-gray-500 text-sm"><Clock size={20} className="mx-auto mb-2 opacity-40" />No bus services available at this time</div>
         )}
         {services.map(s => <BusServiceRow key={s.ServiceNo} service={s} />)}
       </div>
       {services.length > 0 && (
-        <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800 text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1"><Clock size={9} />Live data from LTA – updates every 20s</div>
+        <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-800 text-[11px] text-transit-muted dark:text-gray-400 flex items-center gap-1"><Clock size={10} />Live data from LTA – updates every 20s</div>
       )}
     </div>
   );
