@@ -3,6 +3,7 @@
 A real-time public transport companion for Singapore — live MRT/LRT train and bus arrivals, station crowd levels, service alerts, and a guided **Circle Line CCL6** wayfinding tutorial. Built on the official **LTA DataMall** feed, proxied securely through a Supabase Edge Function so the API key never touches the browser.
 
 🔗 **Repo:** https://github.com/evanisacoder26/singapore-transport-live-application
+**Website URL** https://evanisacoder26.github.io/singapore-transport-live-application/
 
 ---
 
