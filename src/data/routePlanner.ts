@@ -53,29 +53,64 @@ function buildGraph() {
     graph.set(code, { code, station, edges: [] });
   }
 
-  // Group stations by line, preserving order
-  const lineStations = new Map<string, Station[]>();
+  // Group stations by CODE PREFIX (letters), then connect in numeric order.
+  // Branch stations (CG Changi, CE Marina Bay ext) are stored under their
+  // parent line's array (line:'EW'/'CC') and interleaved at the wrong spot —
+  // CG1/CG2 sit after EW33 Tuas Link, CE1/CE2 between CC29 and CC30. Grouping
+  // by the display `line` + array order therefore falsely links a trunk
+  // terminus straight into the branch (Tuas Link → Expo). Grouping by code
+  // prefix and sorting numerically gives each physical track its own chain.
+  const prefixGroups = new Map<string, Station[]>();
   for (const s of STATIONS) {
-    if (!s.underConstruction) {
-      const list = lineStations.get(s.line) ?? [];
-      list.push(s);
-      lineStations.set(s.line, list);
-    }
+    if (s.underConstruction) continue;
+    const prefix = s.code.match(/^[A-Za-z]+/)?.[0] ?? s.code;
+    const list = prefixGroups.get(prefix) ?? [];
+    list.push(s);
+    prefixGroups.set(prefix, list);
   }
 
-  // Add edges between consecutive stations on same line
-  for (const [lineId, stations] of lineStations) {
-    const travelTime = LINE_TRAVEL_TIMES[lineId] ?? 2.0;
+  const stationNum = (code: string) => {
+    const m = code.match(/(\d+)$/);
+    return m ? parseInt(m[1], 10) : 0;
+  };
+
+  for (const [prefix, stations] of prefixGroups) {
+    stations.sort((a, b) => stationNum(a.code) - stationNum(b.code));
+    // Branch-specific time (CG/CE) if defined, else the display line's time.
+    const travelTime = LINE_TRAVEL_TIMES[prefix] ?? LINE_TRAVEL_TIMES[stations[0]?.line] ?? 2.0;
     for (let i = 0; i < stations.length - 1; i++) {
       const a = stations[i];
       const b = stations[i + 1];
-
       const nodeA = graph.get(a.code);
       const nodeB = graph.get(b.code);
       if (nodeA && nodeB) {
-        nodeA.edges.push({ target: b.code, line: lineId, time: travelTime, targetStation: b });
-        nodeB.edges.push({ target: a.code, line: lineId, time: travelTime, targetStation: a });
+        // Keep the display line so the route renders as the correct line.
+        nodeA.edges.push({ target: b.code, line: a.line, time: travelTime, targetStation: b });
+        nodeB.edges.push({ target: a.code, line: a.line, time: travelTime, targetStation: a });
       }
+    }
+  }
+
+  // Branch / loop-arm junctions: physical track links that aren't adjacent in
+  // the per-prefix numeric sequence — each attaches a branch to the trunk
+  // station where it actually diverges.
+  const JUNCTIONS: { a: string; b: string; line: string }[] = [
+    { a: 'EW4', b: 'CG1', line: 'EW' },  // Tanah Merah ↔ Expo (Changi Airport branch)
+    { a: 'CC4', b: 'CE1', line: 'CC' },  // Promenade ↔ Bayfront (Marina Bay extension)
+    { a: 'STC', b: 'SE1', line: 'SK' },  // Sengkang ↔ East Loop
+    { a: 'STC', b: 'SW1', line: 'SK' },  // Sengkang ↔ West Loop
+    { a: 'PTC', b: 'PE1', line: 'PG' },  // Punggol ↔ East Loop
+    { a: 'PTC', b: 'PW1', line: 'PG' },  // Punggol ↔ West Loop
+  ];
+  for (const j of JUNCTIONS) {
+    const nodeA = graph.get(j.a);
+    const nodeB = graph.get(j.b);
+    const stA = stationByCode.get(j.a);
+    const stB = stationByCode.get(j.b);
+    if (nodeA && nodeB && stA && stB) {
+      const t = LINE_TRAVEL_TIMES[j.line] ?? 2.0;
+      nodeA.edges.push({ target: j.b, line: j.line, time: t, targetStation: stB });
+      nodeB.edges.push({ target: j.a, line: j.line, time: t, targetStation: stA });
     }
   }
 
@@ -228,11 +263,13 @@ export function findRoute(fromCode: string, toCode: string): RouteResult | null 
   function pushSegment(lineId: string, startIdx: number, endIdx: number, travelTime: number) {
     if (!pathSteps) return;
     const lineInfo = LINES.find(l => l.id === lineId);
-    const stationCodes: string[] = [fromCode];
-
-    for (let i = 0; i < startIdx; i++) {
-      stationCodes.push(pathSteps[i].code);
-    }
+    // Boarding station = where you get on THIS line: the journey origin for the
+    // first segment, otherwise the station the previous leg / interchange walk
+    // left you at (pathSteps[startIdx - 1]). Earlier this seeded every segment
+    // with fromCode + all preceding stations, so each leg falsely started at the
+    // origin and its stop count accumulated the whole journey.
+    const boardCode = startIdx > 0 ? pathSteps[startIdx - 1].code : fromCode;
+    const stationCodes: string[] = [boardCode];
 
     for (let i = startIdx; i < endIdx; i++) {
       stationCodes.push(pathSteps[i].code);
@@ -263,7 +300,8 @@ export function findRoute(fromCode: string, toCode: string): RouteResult | null 
   }
 
   const totalTime = Math.round(pathSteps.reduce((a, s) => a + s.time, 0));
-  const totalStops = pathSteps.length;
+  // Count ridden stops only — interchange walks aren't stops.
+  const totalStops = pathSteps.filter(s => s.line !== '__interchange__').length;
   const interchanges = segments.length - 1;
 
   return { segments, totalTime, totalStops, interchanges };

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { TrainFront as Train, TramFront as Tram, Bus, RefreshCw, MapPin, Moon, Sun, LocateFixed, Star, Clock, RotateCw } from 'lucide-react';
+import { TrainFront as Train, TramFront as Tram, Bus, RefreshCw, MapPin, Moon, Sun, LocateFixed, Star, Clock, RotateCw, Navigation } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import LineSelector from './components/LineSelector';
 import StationCard from './components/StationCard';
@@ -9,6 +9,7 @@ import SearchBar from './components/SearchBar';
 import BusStopList from './components/BusStopList';
 import BusArrivalBoard from './components/BusArrivalBoard';
 import CclWayfinding from './components/CclWayfinding';
+import RoutePlanner from './components/RoutePlanner';
 import HeaderClock from './components/HeaderClock';
 import { STATIONS, getStationsByLine, searchStations, type Station } from './data/stations';
 import { useCrowdData, useTrainAlerts, useMaintenanceData } from './hooks/useMrtData';
@@ -18,7 +19,7 @@ import { useFavourites } from './hooks/useFavourites';
 import { getNearestStations } from './data/stationCoords';
 import { formatDistance } from './lib/geo';
 
-type Tab = 'mrt' | 'lrt' | 'bus' | 'ccl';
+type Tab = 'mrt' | 'lrt' | 'bus' | 'ccl' | 'route';
 
 export default function App() {
   const { toggleTheme, theme } = useTheme();
@@ -131,6 +132,7 @@ export default function App() {
     if (t === 'bus') return <Bus size={15} />;
     if (t === 'lrt') return <Tram size={15} />;
     if (t === 'ccl') return <RotateCw size={15} />;
+    if (t === 'route') return <Navigation size={15} />;
     return <Train size={15} />;
   };
 
@@ -138,6 +140,7 @@ export default function App() {
     if (t === 'mrt') return 'MRT';
     if (t === 'lrt') return 'LRT';
     if (t === 'ccl') return 'CCL';
+    if (t === 'route') return 'Route';
     return 'Bus';
   };
 
@@ -155,7 +158,7 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
-                {tab === 'ccl' ? 'SG Circle Line' : `SG ${tabLabel(tab)} Live`}
+                {tab === 'ccl' ? 'SG Circle Line' : tab === 'route' ? 'SG Route Planner' : `SG ${tabLabel(tab)} Live`}
               </h1>
               <HeaderClock />
             </div>
@@ -181,7 +184,7 @@ export default function App() {
       {/* Tab switcher */}
       <div className="max-w-6xl mx-auto px-4 pt-4">
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-1">
-          {(['mrt', 'lrt', 'bus', 'ccl'] as Tab[]).map(t => (
+          {(['mrt', 'lrt', 'bus', 'ccl', 'route'] as Tab[]).map(t => (
             <button key={t} onClick={() => handleTabChange(t)}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 tab === t ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
@@ -320,6 +323,13 @@ export default function App() {
         {tab === 'ccl' && (
           <div className="max-w-2xl mx-auto">
             <CclWayfinding />
+          </div>
+        )}
+
+        {/* Route planner tab */}
+        {tab === 'route' && (
+          <div className="max-w-2xl mx-auto">
+            <RoutePlanner />
           </div>
         )}
 
