@@ -41,7 +41,10 @@ export default function CclWayfinding() {
                 {s.code}
               </span>
               <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 flex-1">{s.name}</span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">Opens {s.openingDate}</span>
+              <span className="flex flex-col items-end">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">To be commissioned</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Opens {s.openingDate}</span>
+              </span>
             </div>
           ))}
         </div>

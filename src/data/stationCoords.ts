@@ -118,11 +118,11 @@ const STATION_COORDS: Record<string, { lat: number; lng: number }> = {
   CC27: { lat: 1.2723, lng: 103.8027 },
   CC28: { lat: 1.2707, lng: 103.8097 },
   CC29: { lat: 1.2653, lng: 103.8210 },
-  CE1: { lat: 1.2818, lng: 103.8590 },
-  CE2: { lat: 1.2762, lng: 103.8544 },
   CC30: { lat: 1.2706, lng: 103.8328 },
   CC31: { lat: 1.2742, lng: 103.8418 },
   CC32: { lat: 1.2745, lng: 103.8479 },
+  CC33: { lat: 1.2762, lng: 103.8544 }, // Marina Bay (formerly CE2)
+  CC34: { lat: 1.2818, lng: 103.8590 }, // Bayfront (formerly CE1)
 
   // ===== Downtown Line =====
   DT1: { lat: 1.3784, lng: 103.7625 },

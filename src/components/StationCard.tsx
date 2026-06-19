@@ -26,7 +26,10 @@ for (const l of LINES) LINE_MAP[l.id] = l.color;
 
 export default function StationCard({ station, crowdEntry, hasMaintenance, onClick, isSelected, distanceLabel, isFavourite, onToggleFavourite }: Props) {
   const crowd = crowdConfig[crowdEntry?.CrowdLevel ?? 'na'] ?? crowdConfig.na;
-  const isUC = station.underConstruction;
+  // To-be-commissioned (CCL6) stations render in the line colour with their own
+  // badge, so they are NOT treated as the grey under-construction style.
+  const isTBC = station.toBeCommissioned;
+  const isUC = station.underConstruction && !isTBC;
   const interchanges = getInterchanges(station.name, station.line);
   const hasIC = isInterchange(station.name);
 
@@ -84,6 +87,12 @@ export default function StationCard({ station, crowdEntry, hasMaintenance, onCli
                 <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-500">
                   <Construction size={11} />
                   Opens {station.openingDate}
+                </span>
+              )}
+              {isTBC && (
+                <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-500">
+                  <Construction size={11} />
+                  To be commissioned
                 </span>
               )}
               {!isUC && crowdEntry?.CrowdLevel && crowdEntry.CrowdLevel !== 'na' && (

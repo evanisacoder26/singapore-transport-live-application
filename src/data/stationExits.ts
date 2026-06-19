@@ -165,6 +165,28 @@ export const STATION_EXITS: Record<string, StationExit[]> = {
     { label: '7', landmarks: ['National Cancer Centre Singapore', 'Singapore National Eye Centre'] },
     { label: '8', landmarks: ["Pearl's Hill City Park"] },
   ],
+
+  // ===== CCL6 (to be commissioned 12 July 2026) =====
+  // CCL6 stations use NUMBERED exits: Keppel (3), Cantonment (4), Prince Edward
+  // Road (2). Exit locations + nearby places verified against Land Transport
+  // Guru station exit guides (landtransportguru.net).
+  Keppel: [
+    { label: '1', landmarks: ['Keppel Road (Westbound)', 'Taxi stand'] },
+    { label: '2', landmarks: ['Keppel Road (Eastbound)', 'Tanjong Pagar Distripark'] },
+    { label: '3', landmarks: ['Keppel Road (Westbound)', 'Tanjong Pagar Distripark'] },
+  ],
+
+  Cantonment: [
+    { label: '1', landmarks: ['Keppel Road (Westbound)', 'Tanjong Pagar Distripark'] },
+    { label: '2', landmarks: ['Spottiswoode Park Road', 'Spottiswoode Park Estate'] },
+    { label: '3', landmarks: ['Everton Road', 'Cantonment Towers'] },
+    { label: '4', landmarks: ['Keppel Road (Eastbound)', 'Former Tanjong Pagar Railway Station'] },
+  ],
+
+  'Prince Edward Road': [
+    { label: '1', landmarks: ['Shenton Way', '76 Shenton', '78 Shenton'] },
+    { label: '2', landmarks: ['Palmer Road', 'MAS Building', 'Hock Teck See Temple', 'Bestway Building', 'Shenton Way Bus Terminal'] },
+  ],
 };
 
 export function getStationExits(stationName: string): StationExit[] | null {

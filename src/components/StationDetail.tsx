@@ -4,6 +4,7 @@ import { LINES, getInterchanges, isInterchange } from '../data/stations';
 import type { CrowdEntry, MaintenanceEntry } from '../hooks/useMrtData';
 import { getOperatingHours } from '../data/trainFrequency';
 import { getStationExits } from '../data/stationExits';
+import { getStationTiming } from '../data/stationTimings';
 import { useFavourites } from '../hooks/useFavourites';
 
 const TEL_INTERCHANGE_STATIONS = new Set([
@@ -32,8 +33,14 @@ for (const l of LINES) LINE_MAP[l.id] = { name: l.name, color: l.color };
 
 export default function StationDetail({ station, crowdEntry, maintenance, onClose, onRefresh, refreshing }: Props) {
   const crowd = crowdConfig[crowdEntry?.CrowdLevel ?? 'na'] ?? crowdConfig.na;
-  const hours = getOperatingHours(station.line);
-  const isUC = station.underConstruction;
+  // Official per-station first/last train (Mon) when available; else line hours.
+  const timing = getStationTiming(station.code);
+  const hours = timing ? `${timing.first} – ${timing.last}` : getOperatingHours(station.line);
+  // To-be-commissioned (CCL6) stations render in the line colour with exits and
+  // nearby places, but with "Coming soon" train timings and a dedicated banner —
+  // distinct from the grey under-construction treatment.
+  const isTBC = station.toBeCommissioned;
+  const isUC = station.underConstruction && !isTBC;
   const interchanges = getInterchanges(station.name, station.line);
   const hasInterchange = isInterchange(station.name);
   const isTEL = station.line === 'TE';
@@ -116,6 +123,19 @@ export default function StationDetail({ station, crowdEntry, maintenance, onClos
           </div>
         )}
 
+        {isTBC && (
+          <div className="bg-amber-50 dark:bg-amber-950 rounded-2xl border border-amber-200 dark:border-amber-900 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Construction size={16} className="text-amber-600 dark:text-amber-400" />
+              <h3 className="font-semibold text-amber-800 dark:text-amber-300 text-sm">To Be Commissioned</h3>
+            </div>
+            <p className="text-amber-700 dark:text-amber-400 text-sm">
+              New CCL6 station. Opens on <span className="font-semibold">{station.openingDate}</span>
+              {station.publicpreview && <> · public preview <span className="font-semibold">{station.publicpreview}</span></>}.
+            </p>
+          </div>
+        )}
+
         {!isUC && (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
@@ -132,9 +152,9 @@ export default function StationDetail({ station, crowdEntry, maintenance, onClos
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{station.line} Line</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Operating Hours</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">First / Last Train</span>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1">
-                  <Clock size={12} className="text-gray-400" />{hours}
+                  <Clock size={12} className="text-gray-400" />{isTBC ? 'Coming soon' : hours}
                 </span>
               </div>
             </div>
@@ -151,7 +171,8 @@ export default function StationDetail({ station, crowdEntry, maintenance, onClos
             <div className="space-y-3">
               {interchanges.map(ic => {
                 const info = LINE_MAP[ic.lineId];
-                const icHours = getOperatingHours(ic.lineId);
+                const icTiming = getStationTiming(ic.stationCode);
+                const icHours = icTiming ? `${icTiming.first} – ${icTiming.last}` : getOperatingHours(ic.lineId);
                 return (
                   <div key={ic.lineId} className="flex items-center gap-3">
                     <span
@@ -231,7 +252,7 @@ export default function StationDetail({ station, crowdEntry, maintenance, onClos
           </div>
         )}
 
-        {!isUC && (
+        {!isUC && !isTBC && (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <Users size={16} style={{ color: station.lineColor }} />

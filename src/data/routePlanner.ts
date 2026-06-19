@@ -54,12 +54,13 @@ function buildGraph() {
   }
 
   // Group stations by CODE PREFIX (letters), then connect in numeric order.
-  // Branch stations (CG Changi, CE Marina Bay ext) are stored under their
-  // parent line's array (line:'EW'/'CC') and interleaved at the wrong spot —
-  // CG1/CG2 sit after EW33 Tuas Link, CE1/CE2 between CC29 and CC30. Grouping
-  // by the display `line` + array order therefore falsely links a trunk
-  // terminus straight into the branch (Tuas Link → Expo). Grouping by code
-  // prefix and sorting numerically gives each physical track its own chain.
+  // Branch stations (CG Changi) are stored under their parent line's array
+  // (line:'EW') and interleaved at the wrong spot — CG1/CG2 sit after EW33 Tuas
+  // Link. Grouping by the display `line` + array order therefore falsely links a
+  // trunk terminus straight into the branch (Tuas Link → Expo). Grouping by code
+  // prefix and sorting numerically gives each physical track its own chain. The
+  // Marina Bay spur (CC33/CC34) shares the CC prefix and is handled via the
+  // SPUR_CODES exclusion + explicit JUNCTIONS below.
   const prefixGroups = new Map<string, Station[]>();
   for (const s of STATIONS) {
     if (s.underConstruction) continue;
@@ -74,13 +75,22 @@ function buildGraph() {
     return m ? parseInt(m[1], 10) : 0;
   };
 
+  // Stations that must NOT be auto-linked into their numeric prefix chain: they
+  // hang off a spur and are wired by explicit JUNCTIONS instead. CC33 Marina Bay
+  // and CC34 Bayfront carry CC numbers after the CCL6 renumber, but until CCL6
+  // opens they are only reachable via the Promenade spur. Leaving them in the
+  // chain would link CC29 HarbourFront straight to CC33 (skipping the unopened
+  // CC30–CC32) and invent a track that isn't in service yet.
+  const SPUR_CODES = new Set(['CC33', 'CC34']);
+
   for (const [prefix, stations] of prefixGroups) {
     stations.sort((a, b) => stationNum(a.code) - stationNum(b.code));
+    const chain = stations.filter(s => !SPUR_CODES.has(s.code));
     // Branch-specific time (CG/CE) if defined, else the display line's time.
     const travelTime = LINE_TRAVEL_TIMES[prefix] ?? LINE_TRAVEL_TIMES[stations[0]?.line] ?? 2.0;
-    for (let i = 0; i < stations.length - 1; i++) {
-      const a = stations[i];
-      const b = stations[i + 1];
+    for (let i = 0; i < chain.length - 1; i++) {
+      const a = chain[i];
+      const b = chain[i + 1];
       const nodeA = graph.get(a.code);
       const nodeB = graph.get(b.code);
       if (nodeA && nodeB) {
@@ -95,9 +105,14 @@ function buildGraph() {
   // the per-prefix numeric sequence — each attaches a branch to the trunk
   // station where it actually diverges.
   const JUNCTIONS: { a: string; b: string; line: string }[] = [
-    { a: 'EW4', b: 'CG1', line: 'EW' },  // Tanah Merah ↔ Expo (Changi Airport branch)
-    { a: 'CC4', b: 'CE1', line: 'CC' },  // Promenade ↔ Bayfront (Marina Bay extension)
-    { a: 'STC', b: 'SE1', line: 'SK' },  // Sengkang ↔ East Loop
+    { a: 'EW4', b: 'CG1', line: 'EW' },   // Tanah Merah ↔ Expo (Changi Airport branch)
+    // Marina Bay spur off the Circle Line at Promenade. Post-CCL6 codes:
+    //   CC4 Promenade ↔ CC34 Bayfront ↔ CC33 Marina Bay (spur terminus).
+    // When CCL6 opens, the loop closes via CC29→CC30→CC31→CC32→CC33; at that
+    // point drop these two and remove CC33/CC34 from SPUR_CODES above.
+    { a: 'CC4', b: 'CC34', line: 'CC' },  // Promenade ↔ Bayfront
+    { a: 'CC34', b: 'CC33', line: 'CC' }, // Bayfront ↔ Marina Bay
+    { a: 'STC', b: 'SE1', line: 'SK' },   // Sengkang ↔ East Loop
     { a: 'STC', b: 'SW1', line: 'SK' },  // Sengkang ↔ West Loop
     { a: 'PTC', b: 'PE1', line: 'PG' },  // Punggol ↔ East Loop
     { a: 'PTC', b: 'PW1', line: 'PG' },  // Punggol ↔ West Loop

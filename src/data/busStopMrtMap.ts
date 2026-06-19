@@ -37,7 +37,7 @@ const BUS_STOP_MRT_MAP: Record<string, string[]> = {
   'dhoby ghaut stn': ['NS24', 'NE6', 'CC1'],
   'city hall stn': ['NS25', 'EW13'],
   'raffles place stn': ['NS26', 'EW14'],
-  'marina bay stn': ['NS27', 'CE2', 'TE20'],
+  'marina bay stn': ['NS27', 'CC33', 'TE20'],
   'marina sth pier stn': ['NS28'],
 
   // EW Line
@@ -123,7 +123,7 @@ const BUS_STOP_MRT_MAP: Record<string, string[]> = {
   'pasir panjang stn': ['CC26'],
   'labrador park stn': ['CC27'],
   'telok blangah stn': ['CC28'],
-  'bayfront stn': ['CE1', 'DT16'],
+  'bayfront stn': ['CC34', 'DT16'],
 
   // DT Line
   'bukit panjang stn': ['DT1', 'BP6'],

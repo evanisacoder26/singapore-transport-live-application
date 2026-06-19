@@ -5,6 +5,10 @@ export interface Station {
   lineColor: string;
   exits: number;
   underConstruction?: boolean;
+  // Built / renumbered but not yet in passenger service. Renders in the line
+  // colour (not the grey under-construction style) with a "To be commissioned"
+  // flag and "Coming soon" train timings. Still excluded from journey routing.
+  toBeCommissioned?: boolean;
   openingDate?: string;
   publicpreview?: string;
 }
@@ -146,12 +150,19 @@ export const STATIONS: Station[] = [
   { code: 'CC27', name: 'Labrador Park', line: 'CC', lineColor: '#FA9E0D', exits: 1 },
   { code: 'CC28', name: 'Telok Blangah', line: 'CC', lineColor: '#FA9E0D', exits: 1 },
   { code: 'CC29', name: 'HarbourFront', line: 'CC', lineColor: '#FA9E0D', exits: 5 },
-  { code: 'CE1', name: 'Bayfront', line: 'CC', lineColor: '#FA9E0D', exits: 2 },
-  { code: 'CE2', name: 'Marina Bay', line: 'CC', lineColor: '#FA9E0D', exits: 5 },
-  // CCL6 Under Construction
-  { code: 'CC30', name: 'Keppel', line: 'CC', lineColor: '#FA9E0D', exits: 0, underConstruction: true, openingDate: '12 July 2026', publicpreview:  '4 July 2026'  },
-  { code: 'CC31', name: 'Cantonment', line: 'CC', lineColor: '#FA9E0D', exits: 0, underConstruction: true, openingDate: '12 July 2026' },
-  { code: 'CC32', name: 'Prince Edward Road', line: 'CC', lineColor: '#FA9E0D', exits: 0, underConstruction: true, openingDate: '12 July 2026' },
+  // ===== CCL6 — closes the Circle Line loop. Opens 12 July 2026. =====
+  // Three new stations link HarbourFront to Marina Bay. Shown in CCL yellow and
+  // flagged "To be commissioned" (not the grey under-construction style), with
+  // exits/nearby places listed and train timings marked "Coming soon".
+  { code: 'CC30', name: 'Keppel', line: 'CC', lineColor: '#FA9E0D', exits: 3, toBeCommissioned: true, underConstruction: true, openingDate: '12 July 2026', publicpreview: '4 July 2026' },
+  { code: 'CC31', name: 'Cantonment', line: 'CC', lineColor: '#FA9E0D', exits: 4, toBeCommissioned: true, underConstruction: true, openingDate: '12 July 2026' },
+  { code: 'CC32', name: 'Prince Edward Road', line: 'CC', lineColor: '#FA9E0D', exits: 2, toBeCommissioned: true, underConstruction: true, openingDate: '12 July 2026' },
+  // CCL6 renumbers the former CE branch into the main loop sequence:
+  //   CE2 Marina Bay -> CC33   (sits next to Prince Edward Road)
+  //   CE1 Bayfront   -> CC34   (sits next to Promenade)
+  // Both are already in passenger service today via the Promenade spur.
+  { code: 'CC33', name: 'Marina Bay', line: 'CC', lineColor: '#FA9E0D', exits: 5 },
+  { code: 'CC34', name: 'Bayfront', line: 'CC', lineColor: '#FA9E0D', exits: 2 },
 
   // ===== Downtown Line =====
   { code: 'DT1', name: 'Bukit Panjang', line: 'DT', lineColor: '#005EC4', exits: 4 },
@@ -316,7 +327,7 @@ const INTERCHANGE_MAP: Record<string, InterchangeInfo[]> = {
   ],
   'Marina Bay': [
     { lineId: 'NS', stationCode: 'NS27' },
-    { lineId: 'CC', stationCode: 'CE2' },
+    { lineId: 'CC', stationCode: 'CC33' },
     { lineId: 'TE', stationCode: 'TE20' },
   ],
   'Paya Lebar': [
@@ -373,7 +384,7 @@ const INTERCHANGE_MAP: Record<string, InterchangeInfo[]> = {
     { lineId: 'DT', stationCode: 'DT15' },
   ],
   'Bayfront': [
-    { lineId: 'CC', stationCode: 'CE1' },
+    { lineId: 'CC', stationCode: 'CC34' },
     { lineId: 'DT', stationCode: 'DT16' },
   ],
   'Botanic Gardens': [
